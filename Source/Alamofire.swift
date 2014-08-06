@@ -883,9 +883,23 @@ extension Alamofire.Request {
 extension Alamofire.Request {
     class func JSONResponseSerializer(options: NSJSONReadingOptions = .AllowFragments) -> (NSURLRequest, NSHTTPURLResponse?, NSData?, NSError?) -> (AnyObject?, NSError?) {
         return { (request, response, data, error) in
-            var serializationError: NSError?
-            let JSON: AnyObject! = NSJSONSerialization.JSONObjectWithData(data, options: options, error: &serializationError)
-            return (JSON, serializationError)
+            if let contentType = request.valueForHTTPHeaderField("content-type") {
+                var serializationError: NSError?
+                let JSON: AnyObject! = NSJSONSerialization.JSONObjectWithData(data, options: options, error: &serializationError)
+                return (JSON, serializationError)
+                
+            } else {
+                // Probably error condition. Expecting json, recieved unencoded response.
+                let string = NSString(data: data, encoding: NSUTF8StringEncoding)
+                if let response = response {
+                    let httpResponse = response as NSHTTPURLResponse
+                    if httpResponse.statusCode < 200 || httpResponse.statusCode >= 300 {
+                        var e = NSError(domain: string, code: httpResponse.statusCode, userInfo: ["Error" : string])
+                        return (string, e)
+                    }
+                }
+                return (string, error)
+            }
         }
     }
 
