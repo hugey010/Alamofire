@@ -895,6 +895,9 @@ extension Alamofire.Request {
                     let httpResponse = response as NSHTTPURLResponse
                     if httpResponse.statusCode < 200 || httpResponse.statusCode >= 300 {
                         var e = NSError(domain: string, code: httpResponse.statusCode, userInfo: ["Error" : string])
+                        if httpResponse.statusCode == 401 {
+                            NSNotificationCenter.defaultCenter().postNotificationName("Unauthorized", object: nil)
+                        }
                         return (string, e)
                     }
                 }
