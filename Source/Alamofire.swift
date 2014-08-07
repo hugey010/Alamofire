@@ -153,46 +153,9 @@ public struct Alamofire {
 
         var automaticallyStartsRequests: Bool = true
 
-        lazy var defaultHeaders: [String: String] = {
-            // Accept-Encoding HTTP Header; see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3
-            let acceptEncoding: String = "gzip;q=1.0,compress;q=0.5"
-
-            // Accept-Language HTTP Header; see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.4
-            let acceptLanguage: String = {
-                var components: [String] = []
-                for (index, languageCode) in enumerate(NSLocale.preferredLanguages() as [String]) {
-                    let q = 1.0 - (Double(index) * 0.1)
-                    components.append("\(languageCode);q=\(q)")
-                    if q <= 0.5 {
-                        break
-                    }
-                }
-
-                return components.reduce("", {$0 == "" ? $1 : "\($0),\($1)"})
-            }()
-
-            // User-Agent Header; see http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.43
-            let userAgent: String = {
-                if let info = NSBundle.mainBundle().infoDictionary {
-                    let executable: AnyObject? = info[kCFBundleExecutableKey]
-                    let bundle: AnyObject? = info[kCFBundleIdentifierKey]
-                    let version: AnyObject? = info[kCFBundleVersionKey]
-                    let os: AnyObject? = NSProcessInfo.processInfo()?.operatingSystemVersionString
-
-                    var mutableUserAgent = NSMutableString(string: "\(executable!)/\(bundle!) (\(version!); OS \(os!))") as CFMutableString
-                    let transform = NSString(string: "Any-Latin; Latin-ASCII; [:^ASCII:] Remove") as CFString
-                    if CFStringTransform(mutableUserAgent, nil, transform, 0) == 1 {
-                        return mutableUserAgent as NSString
-                    }
-                }
-
-                return "Alamofire"
-            }()
-
-            return ["Accept-Encoding": acceptEncoding,
-                    "Accept-Language": acceptLanguage,
-                    "User-Agent": userAgent]
-        }()
+        
+        var defaultHeaders: [String : String] = ["Accept-Encoding" : "application/json",
+                                                "Accept-Language" : "en-us"]
 
         required init(configuration: NSURLSessionConfiguration! = nil) {
             self.delegate = SessionDelegate()
