@@ -154,8 +154,9 @@ public struct Alamofire {
         var automaticallyStartsRequests: Bool = true
 
         
-        var defaultHeaders: [String : String] = ["Accept-Encoding" : "application/json",
-                                                "Accept-Language" : "en-us"]
+        var defaultHeaders = ["Content-Type" : "application/json",
+                            "Accept-Language" : "en-us",
+                            "Accept-Encoding" : "gzip;q=1.0,compress;q=0.5"]
 
         required init(configuration: NSURLSessionConfiguration! = nil) {
             self.delegate = SessionDelegate()
